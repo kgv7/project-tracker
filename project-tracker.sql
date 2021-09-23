@@ -100,11 +100,29 @@ CREATE TABLE public.students (
     id integer NOT NULL,
     first_name character varying(30),
     last_name character varying(30),
-    github character varying(30)
+    github character varying(30) NOT NULL,
+    email character varying(30)
 );
 
 
 ALTER TABLE public.students OWNER TO hackbright;
+
+--
+-- Name: report_card_view; Type: VIEW; Schema: public; Owner: hackbright
+--
+
+CREATE VIEW public.report_card_view AS
+ SELECT s.first_name,
+    s.last_name,
+    p.title,
+    p.max_grade,
+    g.grade
+   FROM ((public.students s
+     JOIN public.grades g ON (((s.github)::text = (g.student_github)::text)))
+     JOIN public.projects p ON (((p.title)::text = (g.project_title)::text)));
+
+
+ALTER TABLE public.report_card_view OWNER TO hackbright;
 
 --
 -- Name: students_id_seq; Type: SEQUENCE; Schema: public; Owner: hackbright
@@ -177,9 +195,9 @@ COPY public.projects (id, title, description, max_grade) FROM stdin;
 -- Data for Name: students; Type: TABLE DATA; Schema: public; Owner: hackbright
 --
 
-COPY public.students (id, first_name, last_name, github) FROM stdin;
-1	Jane	Hacker	jhacks
-2	Sarah	Developer	sdevelops
+COPY public.students (id, first_name, last_name, github, email) FROM stdin;
+1	Jane	Hacker	jhacks	\N
+2	Sarah	Developer	sdevelops	\N
 \.
 
 
@@ -225,7 +243,7 @@ ALTER TABLE ONLY public.projects
 --
 
 ALTER TABLE ONLY public.students
-    ADD CONSTRAINT students_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT students_pkey PRIMARY KEY (github);
 
 
 --
